@@ -7,7 +7,7 @@ const CORS = {
   'Content-Type': 'application/json'
 }
 
-function buildMixedPrompt(leads) {
+function buildMixedPrompt(leads, limit) {
   return `You are a lead scoring expert for the Fort Wayne Spotlight — a shared-cost homeowner postcard mailed to 5,000 homes in the southwest Fort Wayne / Aboite / Illinois Road corridor. Advertisers on this mailer are local businesses whose services homeowners actually buy. Score each lead 1–10 by following every step below in order.
 
 ━━━ STEP 1 — HARD DISQUALIFIERS (check first) ━━━
@@ -85,7 +85,7 @@ If none apply, set watch_out = "" (empty string).
 ${JSON.stringify(leads)}
 
 ━━━ OUTPUT FORMAT ━━━
-Return ONLY a valid JSON array of the top 5 highest-scoring leads, sorted descending by score. Use EXACTLY these field names — no renaming, no extras:
+Return ONLY a valid JSON array of the top ${limit} highest-scoring leads, sorted descending by score. Use EXACTLY these field names — no renaming, no extras:
 - "business_name"
 - "address"
 - "category"
@@ -100,7 +100,7 @@ Return ONLY a valid JSON array of the top 5 highest-scoring leads, sorted descen
 Preserve all original field values exactly. Output nothing else — no markdown, no explanation, just the raw JSON array starting with [ and ending with ].`
 }
 
-function buildSameNichePrompt(leads, niche) {
+function buildSameNichePrompt(leads, niche, limit) {
   return `You are a lead scoring expert for the Fort Wayne Spotlight — a shared-cost homeowner postcard mailed to 5,000 homes in the southwest Fort Wayne / Aboite / Illinois Road corridor.
 
 IMPORTANT: All leads in this list are ${niche} businesses. Category fit is identical for every lead — skip category scoring entirely. Differentiate instead on location proximity, decision-maker access, and contact completeness.
@@ -169,7 +169,7 @@ If none apply, set watch_out = "" (empty string).
 ${JSON.stringify(leads)}
 
 ━━━ OUTPUT FORMAT ━━━
-Return ONLY a valid JSON array of the top 5 highest-scoring leads, sorted descending by score. Use EXACTLY these field names — no renaming, no extras:
+Return ONLY a valid JSON array of the top ${limit} highest-scoring leads, sorted descending by score. Use EXACTLY these field names — no renaming, no extras:
 - "business_name"
 - "address"
 - "category"
@@ -184,8 +184,8 @@ Return ONLY a valid JSON array of the top 5 highest-scoring leads, sorted descen
 Preserve all original field values exactly. Output nothing else — no markdown, no explanation, just the raw JSON array starting with [ and ending with ].`
 }
 
-function buildPrompt(leads, niche) {
-  return niche ? buildSameNichePrompt(leads, niche) : buildMixedPrompt(leads)
+function buildPrompt(leads, niche, limit) {
+  return niche ? buildSameNichePrompt(leads, niche, limit) : buildMixedPrompt(leads, limit)
 }
 
 export const handler = async (event) => {
@@ -210,13 +210,14 @@ export const handler = async (event) => {
   }
   console.log('[score-leads] key present, length:', key.length)
 
-  let leads, niche
+  let leads, niche, limit
   try {
     const parsed = JSON.parse(event.body || '{}')
     leads = parsed.leads
     niche = typeof parsed.niche === 'string' ? parsed.niche.trim() : ''
+    limit = Number.isInteger(parsed.limit) && parsed.limit > 0 ? parsed.limit : 10
     if (!Array.isArray(leads) || leads.length === 0) throw new Error('invalid')
-    console.log('[score-leads] leads received:', leads.length)
+    console.log('[score-leads] leads received:', leads.length, '— limit:', limit)
   } catch {
     console.error('[score-leads] ERROR: bad request body')
     return {
@@ -238,7 +239,7 @@ export const handler = async (event) => {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: 4000,
-      messages: [{ role: 'user', content: buildPrompt(leads, niche) }]
+      messages: [{ role: 'user', content: buildPrompt(leads, niche, limit) }]
     })
   })
 

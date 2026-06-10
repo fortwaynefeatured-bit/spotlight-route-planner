@@ -80,6 +80,7 @@ function normalizeRow(row) {
       out[mapped] = String(val).trim()
     }
   }
+  out._raw = row  // preserved for CSV export — never sent to scoring API
   return out
 }
 

@@ -510,6 +510,66 @@ body {
   font-style: italic;
 }
 
+/* ── Bulk Scoring ── */
+.bulk-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.bulk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.bulk-count {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.bulk-score-btn {
+  padding: 0.6rem 1.1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.bulk-score-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bulk-score-btn:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+.download-btn {
+  padding: 0.35rem 0.75rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.download-btn:active {
+  opacity: 0.75;
+}
+
 /* keep old .call-btn in case referenced elsewhere */
 .call-btn {
   display: inline-flex;

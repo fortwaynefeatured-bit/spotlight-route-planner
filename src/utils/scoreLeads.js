@@ -1,3 +1,49 @@
+const BULK_BATCH_SIZE = 10
+
+export async function scoreBulk(leads, niche = '', onProgress) {
+  const batches = []
+  for (let i = 0; i < leads.length; i += BULK_BATCH_SIZE) {
+    batches.push(leads.slice(i, i + BULK_BATCH_SIZE))
+  }
+
+  const allResults = []
+  for (let i = 0; i < batches.length; i++) {
+    onProgress?.(i + 1, batches.length)
+
+    // Strip _raw before sending — only used locally for CSV export
+    const cleanBatch = batches[i].map(({ _raw, ...rest }) => rest)
+
+    const res = await fetch('/.netlify/functions/score-leads-bulk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leads: cleanBatch, niche })
+    })
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(`Scoring failed on batch ${i + 1}: ${err.error || res.statusText}`)
+    }
+
+    const data = await res.json()
+    if (!Array.isArray(data)) throw new Error(`Unexpected response format for batch ${i + 1}`)
+
+    // Re-attach _raw by matching business_name
+    const rawMap = {}
+    batches[i].forEach(lead => {
+      const key = (lead.business_name || '').toLowerCase()
+      if (lead._raw && key) rawMap[key] = lead._raw
+    })
+
+    allResults.push(...data.map(scored => ({
+      ...scored,
+      _raw: rawMap[(scored.business_name || '').toLowerCase()] ?? null
+    })))
+  }
+
+  allResults.sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+  return allResults
+}
+
 // Maps every known AI field name variation → our canonical field name
 const ALIASES = {
   business_name: [
@@ -49,11 +95,11 @@ function normalizeLead(lead) {
   return out
 }
 
-export async function scoreLeads(leads, niche = '') {
+export async function scoreLeads(leads, niche = '', limit = 10) {
   const res = await fetch('http://localhost:8888/.netlify/functions/score-leads', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ leads, niche })
+    body: JSON.stringify({ leads, niche, limit })
   })
 
   if (!res.ok) {
