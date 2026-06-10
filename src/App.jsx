@@ -110,38 +110,80 @@ export default function App() {
             disabled={loading}
           >
             <option value="">— All Categories (no filter) —</option>
-            <optgroup label="Tier 1 — Best Fit">
-              <option>Roofing</option>
-              <option>HVAC / Heating & Cooling</option>
-              <option>Lawn Care / Landscaping</option>
-              <option>Pest Control</option>
-              <option>Exterior Painting</option>
-              <option>Windows & Doors</option>
-              <option>Gutters / Tree Service</option>
-              <option>Snow Removal / Driveway</option>
-            </optgroup>
-            <optgroup label="Tier 2">
-              <option>Plumbing</option>
-              <option>Electrical</option>
-              <option>Garage Doors</option>
-              <option>Handyman / Home Repair</option>
-              <option>House Cleaning / Maid Service</option>
-              <option>Carpet / Floor Cleaning</option>
-              <option>Fencing / Siding</option>
-              <option>Pool Service</option>
-            </optgroup>
-            <optgroup label="Tier 3">
-              <option>Dental / Chiropractic / Vet</option>
-              <option>Kitchen & Bath Remodeling</option>
-              <option>Interior Painting</option>
-              <option>Moving / Storage</option>
-              <option>Auto Detailing</option>
-            </optgroup>
-            <optgroup label="Tier 4">
-              <option>Insurance / Financial</option>
-              <option>Real Estate</option>
-              <option>Fitness / Tutoring</option>
-            </optgroup>
+            <option>Accountant</option>
+            <option>Assisted Living Community</option>
+            <option>Attorney</option>
+            <option>Auto Detailer</option>
+            <option>Auto Repair Shop</option>
+            <option>Bakery</option>
+            <option>Bookkeeper</option>
+            <option>Boutique</option>
+            <option>Business Coach</option>
+            <option>Car Wash</option>
+            <option>Chiropractor</option>
+            <option>Cleaning Service</option>
+            <option>Coffee Shop</option>
+            <option>Collision Repair Shop</option>
+            <option>Concrete Contractor</option>
+            <option>Credit Repair Company</option>
+            <option>Dance Studio</option>
+            <option>Daycare</option>
+            <option>Deck Builder</option>
+            <option>Dentist</option>
+            <option>Dog Boarding Facility</option>
+            <option>Dog Trainer</option>
+            <option>Electrician</option>
+            <option>Estate Planning Attorney</option>
+            <option>Eye Doctor</option>
+            <option>Family Restaurant</option>
+            <option>Fence Company</option>
+            <option>Financial Advisor</option>
+            <option>Flooring Company</option>
+            <option>Florist</option>
+            <option>Furniture Store</option>
+            <option>Garage Door Company</option>
+            <option>General Contractor</option>
+            <option>Gutter Company</option>
+            <option>Handyman</option>
+            <option>Hearing Aid Center</option>
+            <option>Home Care Agency</option>
+            <option>HVAC Company</option>
+            <option>Insurance Agent</option>
+            <option>Landscaping Company</option>
+            <option>Lawn Care Company</option>
+            <option>Martial Arts Studio</option>
+            <option>Massage Therapist</option>
+            <option>Mattress Store</option>
+            <option>Meal Prep Service</option>
+            <option>Med Spa</option>
+            <option>Medicare Advisor</option>
+            <option>Mental Health Counselor</option>
+            <option>Mortgage Broker</option>
+            <option>Motorcycle Dealer</option>
+            <option>Moving Company</option>
+            <option>Orthodontist</option>
+            <option>Painting Contractor</option>
+            <option>Pest Control Company</option>
+            <option>Pet Groomer</option>
+            <option>Physical Therapist</option>
+            <option>Pizza Shop</option>
+            <option>Plumber</option>
+            <option>Pool & Spa Company</option>
+            <option>Preschool</option>
+            <option>Primary Care Practice</option>
+            <option>Real Estate Agent</option>
+            <option>Roofer</option>
+            <option>Siding Contractor</option>
+            <option>Snow Removal Company</option>
+            <option>Storage Facility</option>
+            <option>Tax Preparation Service</option>
+            <option>Tire Shop</option>
+            <option>Tree Service Company</option>
+            <option>Tutoring Service</option>
+            <option>Veterinarian</option>
+            <option>Weight Loss Clinic</option>
+            <option>Window Tinting Shop</option>
+            <option>Youth Sports Trainer</option>
           </select>
         </div>
         <FileUpload onFile={handleFile} disabled={loading} />

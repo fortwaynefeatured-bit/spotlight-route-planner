@@ -50,7 +50,7 @@ function normalizeLead(lead) {
 }
 
 export async function scoreLeads(leads, niche = '') {
-  const res = await fetch('/.netlify/functions/score-leads', {
+  const res = await fetch('http://localhost:8888/.netlify/functions/score-leads', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ leads, niche })
