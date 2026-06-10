@@ -1,5 +1,6 @@
 const MODEL = 'llama-3.3-70b-versatile'
 const BATCH_SIZE = 10
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -266,6 +267,7 @@ export const handler = async (event) => {
     try {
       const batchResults = await scoreBatch(batches[i], niche, key)
       allScored.push(...batchResults)
+      if (i < batches.length - 1) await sleep(5000)
     } catch (err) {
       console.error(`[score-leads-bulk] batch ${i + 1} failed:`, err.message)
       return {
