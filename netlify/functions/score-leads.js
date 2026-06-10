@@ -1,4 +1,4 @@
-const MODEL = 'claude-sonnet-4-5'
+const MODEL = 'claude-fable-5'
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
