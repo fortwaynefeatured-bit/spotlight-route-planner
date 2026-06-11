@@ -3,7 +3,7 @@ import FileUpload from './components/FileUpload'
 import LeadMap from './components/LeadMap'
 import StopCard from './components/StopCard'
 import { parseFile } from './utils/parseFile'
-import { scoreLeads, scoreBulk } from './utils/scoreLeads'
+import { scoreLeads } from './utils/scoreLeads'
 import { geocodeAddress } from './utils/geocode'
 import { optimizeRoute } from './utils/routeOptimize'
 
@@ -18,12 +18,6 @@ export default function App() {
   const [error, setError] = useState('')
   const [warning, setWarning] = useState('')
   const [leadCount, setLeadCount] = useState(0)
-  const [parsedLeads, setParsedLeads] = useState([])
-  const [bulkResults, setBulkResults] = useState([])
-  const [bulkLoading, setBulkLoading] = useState(false)
-  const [bulkBatch, setBulkBatch] = useState(0)
-  const [bulkTotal, setBulkTotal] = useState(0)
-  const [bulkError, setBulkError] = useState('')
 
   const handleFile = async (file) => {
     setLoading(true)
@@ -35,9 +29,6 @@ export default function App() {
     try {
       setStatus('Parsing file...')
       const leads = await parseFile(file)
-      setParsedLeads(leads)
-      setBulkResults([])
-      setBulkError('')
 
       if (leads.length === 0) {
         throw new Error(
@@ -90,59 +81,6 @@ export default function App() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleBulkScore = async () => {
-    setBulkLoading(true)
-    setBulkError('')
-    setBulkResults([])
-    setBulkBatch(0)
-    setBulkTotal(Math.ceil(parsedLeads.length / 10))
-
-    try {
-      const results = await scoreBulk(parsedLeads, '', (current, total) => {
-        setBulkBatch(current)
-        setBulkTotal(total)
-      })
-      setBulkResults(results)
-    } catch (e) {
-      setBulkError(e.message || 'Bulk scoring failed. Please try again.')
-    } finally {
-      setBulkLoading(false)
-    }
-  }
-
-  const downloadBulkCsv = () => {
-    if (bulkResults.length === 0) return
-    const rawKeys = bulkResults[0]?._raw ? Object.keys(bulkResults[0]._raw) : []
-    const extraKeys = ['score', 'reason', 'watch_out']
-    const headers = rawKeys.length > 0
-      ? [...rawKeys, ...extraKeys]
-      : ['business_name', 'address', 'category', 'owner_name', 'phone', 'email', 'notes', ...extraKeys]
-
-    const rows = bulkResults.map(lead => {
-      const raw = lead._raw || {}
-      return headers.map(h => {
-        if (h === 'score') return lead.score ?? ''
-        if (h === 'reason') return lead.reason ?? ''
-        if (h === 'watch_out') return lead.watch_out ?? ''
-        return raw[h] ?? lead[h] ?? ''
-      })
-    })
-
-    const csv = [headers, ...rows]
-      .map(row => row.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
-      .join('\n')
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'scored-leads.csv'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 
   return (
@@ -290,45 +228,6 @@ export default function App() {
             ))}
           </div>
         </>
-      )}
-      {parsedLeads.length > 0 && (
-        <div className="bulk-section">
-          <div className="bulk-header">
-            <span className="bulk-count">{parsedLeads.length} leads loaded</span>
-            <button
-              className="bulk-score-btn"
-              onClick={handleBulkScore}
-              disabled={bulkLoading}
-            >
-              {bulkLoading ? 'Scoring...' : 'Score All Leads'}
-            </button>
-          </div>
-
-          {bulkLoading && (
-            <div className="status-bar">
-              <div className="spinner" />
-              <span>Scoring batch {bulkBatch} of {bulkTotal}...</span>
-            </div>
-          )}
-
-          {bulkError && <div className="error-box">{bulkError}</div>}
-
-          {!bulkLoading && bulkResults.length > 0 && (
-            <>
-              <div className="route-summary">
-                <span className="route-badge">{bulkResults.length} leads scored</span>
-                <button className="download-btn" onClick={downloadBulkCsv}>
-                  Download Results as CSV
-                </button>
-              </div>
-              <div className="stops-list">
-                {bulkResults.map((lead, i) => (
-                  <StopCard key={(lead.business_name || '') + i} lead={{ ...lead, stopNum: i + 1 }} />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
       )}
     </div>
   )
